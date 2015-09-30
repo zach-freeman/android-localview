@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
@@ -131,9 +132,14 @@ public class PhotosListViewActivity extends AppCompatActivity implements PhotoLi
 
     @Override
     public void photoListManagerDidFinish(List<FlickrPhoto> photoList) {
-        this.mFlickrPhotoList = photoList;
         this.mProgressBarSpinner.setVisibility(View.INVISIBLE);
-        setupPhotoList();
+        if (photoList.size() > 0) {
+            this.mFlickrPhotoList = photoList;
+            setupPhotoList();
+        } else {
+            Toast.makeText(this,
+                    "Flickr api response malformed", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

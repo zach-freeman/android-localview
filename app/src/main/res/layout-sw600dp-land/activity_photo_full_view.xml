@@ -6,10 +6,9 @@
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/fullImageView"
-        android:layout_width="500dp"
-        android:layout_height="500dp"
-        android:layout_gravity="center_horizontal"
-        fresco:actualImageScaleType="fitCenter">
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal">
     </com.facebook.drawee.view.SimpleDraweeView>
 
     <TextView
@@ -18,8 +17,7 @@
         android:layout_height="200dp"
         android:textColor="@android:color/white"
         android:textColorHighlight="@android:color/primary_text_dark"
-        android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
-        android:textSize="20sp"/>
+        android:textSize="18sp"/>
 
 </LinearLayout>

@@ -54,22 +54,28 @@ public class PhotoListAdapter extends BaseAdapter {
         // getting photo data for the row
         FlickrPhoto flickrPhoto = mFlickrPhotoList.get(position);
 
-        TextView titleComment = (TextView) convertView.findViewById(R.id.titleComment);
-
         // smallImage
-        Uri uri = Uri.parse(flickrPhoto.getSmallImageUrl());
-        SimpleDraweeView draweeView = (SimpleDraweeView) convertView.findViewById(R.id.smallImageView);
-        draweeView.setImageURI(uri);
+        setupSmallImageView(flickrPhoto, convertView);
 
         // titleComment
+        setupTitleCommentView(flickrPhoto, convertView);
+
+        return convertView;
+    }
+
+    private void setupSmallImageView(FlickrPhoto flickrPhoto, View convertView) {
+        Uri smallImageUri = Uri.parse(flickrPhoto.getSmallImageUrl());
+        SimpleDraweeView smallImageView = (SimpleDraweeView) convertView.findViewById(R.id.smallImageView);
+        smallImageView.setImageURI(smallImageUri);
+    }
+
+    private void setupTitleCommentView(FlickrPhoto flickrPhoto, View convertView) {
+        TextView titleCommentView = (TextView) convertView.findViewById(R.id.titleComment);
         String titleString = flickrPhoto.getTitleComment();
         if (titleString.isEmpty()) {
             titleString = "Title not available";
         }
-        titleComment.setText(titleString);
+        titleCommentView.setText(titleString);
 
-
-
-        return convertView;
     }
 }

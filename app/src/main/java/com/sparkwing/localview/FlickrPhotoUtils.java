@@ -1,12 +1,19 @@
 package com.sparkwing.localview;
 
+import android.util.Log;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by zachfreeman on 9/22/15.
  */
 public class FlickrPhotoUtils {
+
+    private static final String TAG = FlickrPhotoUtils.class.getSimpleName();
 
     public enum FlickrPhotoSize {
         PhotoSizeUnknown,
@@ -30,6 +37,31 @@ public class FlickrPhotoUtils {
         PhotoSizeVideoMobileMP4,
         PhotoSizeVideoPlayer
     };
+
+    public static ArrayList<FlickrPhoto> unpackSearchResult(String searchResult) {
+        ArrayList<FlickrPhoto> flickrPhotoList = new ArrayList<FlickrPhoto>();
+        try {
+            JSONObject searchResultJsonObject = new JSONObject(searchResult);
+            JSONObject photosJsonObject = searchResultJsonObject.getJSONObject("photos");
+            JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
+            for (int i = 0; i < photoJsonArray.length(); i++) {
+                JSONObject photoJsonObject = photoJsonArray.getJSONObject(i);
+
+                String title = photoJsonObject.getString("title");
+                if (title.length() == 0 || title == null) {
+                    title = "";
+                }
+                String smallImageUrl = FlickrPhotoUtils.getPhotoUrlForSize(FlickrConstants.SMALL_IMAGE_SIZE, photoJsonObject);
+                String bigImageUrl = FlickrPhotoUtils.getPhotoUrlForSize(FlickrConstants.BIG_IMAGE_SIZE, photoJsonObject);
+                FlickrPhoto flickrPhoto = new FlickrPhoto(title, smallImageUrl, bigImageUrl);
+                flickrPhotoList.add(flickrPhoto);
+            }
+        } catch (JSONException jsonException) {
+            Log.e(TAG, "malformed json response encountered in flickr search result");
+        }
+        return flickrPhotoList;
+
+    }
 
     public static String getPhotoUrlForSize(FlickrPhotoSize size, JSONObject photoJsonObject) throws JSONException {
         String photoUrlString = null;

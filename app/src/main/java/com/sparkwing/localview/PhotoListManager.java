@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class PhotoListManager implements LocationUpdaterListener, PhotoListFetcherListener {
     private static final String TAG = PhotoListManager.class.getSimpleName();
-    private Context mContext;
     private Boolean mPhotoListFetched;
 
     public void setPhotoListManagerListener(PhotoListManagerListener mPhotoListManagerListener) {
@@ -24,8 +23,7 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
     public PhotoListManager(Context context) {
 
         if (Reachability.isConnected(context)) {
-            this.mContext = context;
-            LocationUpdater locationUpdater = new LocationUpdater(this.mContext);
+            LocationUpdater locationUpdater = new LocationUpdater(context);
             locationUpdater.setLocationUpdaterListener(this);
         } else {
             Toast.makeText(context,

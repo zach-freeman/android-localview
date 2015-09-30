@@ -3,6 +3,7 @@ import com.sparkwing.localview.FlickrPhotoUtils
 import org.json.JSONObject
 import org.robolectric.annotation.Config
 import pl.polidea.robospock.RoboSpecification
+import spock.lang.Shared
 import spock.lang.Unroll
 
 import static org.robolectric.annotation.Config.NONE
@@ -37,6 +38,26 @@ class FlickrPhotoUtilsSpec extends RoboSpecification {
         where:
         jsonObject ||   url
         null       ||   null
+    }
+
+    @Unroll
+    def "test unpackSearchResults"() {
+
+        expect:
+        def flickrPhotoList = FlickrPhotoUtils.unpackSearchResult(fileContents)
+        listSize == flickrPhotoList.size()
+
+        where:
+        fileContents                                            | listSize
+        getResourceFileContents('good-flickr-response.json')    | 5
+        getResourceFileContents('bad-flickr-response.json')     | 0
+
+    }
+
+    def getResourceFileContents(String resourceFilename) {
+        def resourcePath = System.getProperty("user.dir") + '/src/test/groovy/unittest/res/'
+        def resourceFilepath = resourcePath + resourceFilename
+        return new File(resourceFilepath).text
     }
 
 }

@@ -1,11 +1,13 @@
 package com.sparkwing.localview;
 
+import android.graphics.PointF;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.drawable.ProgressBarDrawable;
+import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -25,10 +28,15 @@ import com.facebook.drawee.view.SimpleDraweeView;
  */
 public class PhotoFullScreenActivity extends AppCompatActivity implements ControllerListener {
     private static final String TAG = PhotoFullScreenActivity.class.getSimpleName();
+    private static final String SAVE_PHOTO_KEY = "photo";
 
     private SimpleDraweeView mFullImageView;
     private TextView mTitleTextView;
     Animation mSlideAnimation;
+    FlickrPhoto mFlickrPhoto;
+
+    private boolean mShouldAnimateImage;
+    private boolean mIsTabletSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,25 +51,70 @@ public class PhotoFullScreenActivity extends AppCompatActivity implements Contro
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         Bundle bundle = getIntent().getExtras();
-        FlickrPhoto flickrPhoto = bundle.getParcelable(FlickrPhoto.BUNDLE_KEY);
+        mFlickrPhoto = bundle.getParcelable(FlickrPhoto.BUNDLE_KEY);
 
-        setupFullImageView(flickrPhoto);
-        boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
-        if (tabletSize) {
-            setupTitleTextView(flickrPhoto);
+        mShouldAnimateImage = true;
+        mIsTabletSize = getResources().getBoolean(R.bool.isTablet);
+
+        setupFullImageView(mFlickrPhoto);
+
+        if (mIsTabletSize) {
+            setupTitleTextView(mFlickrPhoto);
         }
 
     }
 
-    protected void setupFullImageView(FlickrPhoto flickrPhoto) {
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        // onDestroy gets called when back button is tapped
+        super.onDestroy();
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(SAVE_PHOTO_KEY, mFlickrPhoto);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.containsKey(SAVE_PHOTO_KEY)) {
+            this.mFlickrPhoto = savedInstanceState.getParcelable(SAVE_PHOTO_KEY);
+            mShouldAnimateImage = false;
+        }
+    }
+
+    protected void setupFullImageView(FlickrPhoto flickrPhoto) {
         String bigImageUrl = flickrPhoto.getBigImageUrl();
         Uri uri = Uri.parse(bigImageUrl);
-
+        PointF focusPoint = new PointF(0.0f, 0.0f);
+        ScalingUtils.ScaleType actualImageScaleType = ScalingUtils.ScaleType.CENTER;
+        if (mIsTabletSize) {
+            actualImageScaleType = ScalingUtils.ScaleType.FOCUS_CROP;
+            focusPoint = new PointF(0.0f, 0.5f);
+        }
 
         GenericDraweeHierarchyBuilder draweeHierarchyBuilder = new GenericDraweeHierarchyBuilder(getResources());
         GenericDraweeHierarchy draweeHierarchy = draweeHierarchyBuilder
                 .setProgressBarImage(new ProgressBarDrawable())
+                .setActualImageScaleType(actualImageScaleType)
+                .setActualImageFocusPoint(focusPoint)
                 .build();
         mFullImageView.setHierarchy(draweeHierarchy);
 
@@ -77,6 +130,9 @@ public class PhotoFullScreenActivity extends AppCompatActivity implements Contro
     protected void setupTitleTextView(FlickrPhoto flickrPhoto) {
 
         String titleComment = flickrPhoto.getTitleComment();
+        if (titleComment.isEmpty() || null == titleComment) {
+            titleComment = "No title available";
+        }
         mTitleTextView.setText(titleComment);
         mTitleTextView.setGravity(Gravity.CENTER);
     }
@@ -95,7 +151,9 @@ public class PhotoFullScreenActivity extends AppCompatActivity implements Contro
         if (imageInfo == null) {
             return;
         } else {
-            mFullImageView.startAnimation(mSlideAnimation);
+            if (mShouldAnimateImage == true) {
+                mFullImageView.startAnimation(mSlideAnimation);
+            }
         }
     }
 
