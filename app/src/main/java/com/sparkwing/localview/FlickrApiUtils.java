@@ -2,6 +2,8 @@ package com.sparkwing.localview;
 
 import android.util.Log;
 
+import com.squareup.okhttp.HttpUrl;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,9 +13,9 @@ import java.util.ArrayList;
 /**
  * Created by zachfreeman on 9/22/15.
  */
-public class FlickrPhotoUtils {
+public class FlickrApiUtils {
 
-    private static final String TAG = FlickrPhotoUtils.class.getSimpleName();
+    private static final String TAG = FlickrApiUtils.class.getSimpleName();
 
     public enum FlickrPhotoSize {
         PhotoSizeUnknown,
@@ -51,8 +53,8 @@ public class FlickrPhotoUtils {
                 if (title.length() == 0 || title == null) {
                     title = "";
                 }
-                String smallImageUrl = FlickrPhotoUtils.getPhotoUrlForSize(FlickrConstants.SMALL_IMAGE_SIZE, photoJsonObject);
-                String bigImageUrl = FlickrPhotoUtils.getPhotoUrlForSize(FlickrConstants.BIG_IMAGE_SIZE, photoJsonObject);
+                String smallImageUrl = FlickrApiUtils.getPhotoUrlForSize(FlickrConstants.SMALL_IMAGE_SIZE, photoJsonObject);
+                String bigImageUrl = FlickrApiUtils.getPhotoUrlForSize(FlickrConstants.BIG_IMAGE_SIZE, photoJsonObject);
                 FlickrPhoto flickrPhoto = new FlickrPhoto(title, smallImageUrl, bigImageUrl);
                 flickrPhotoList.add(flickrPhoto);
             }
@@ -61,6 +63,24 @@ public class FlickrPhotoUtils {
         }
         return flickrPhotoList;
 
+    }
+
+    public static HttpUrl getFlickrSearchUrlForCoordinates(String latitude, String longitude) {
+        HttpUrl flickrSearchUrl = new HttpUrl.Builder()
+                .scheme(FlickrConstants.HTTP_SCHEME)
+                .host(FlickrConstants.API_HOST)
+                .addPathSegment(FlickrConstants.SERVICE_PATH)
+                .addPathSegment(FlickrConstants.REST_PATH)
+                .addQueryParameter("method", FlickrConstants.SEARCH_METHOD)
+                .addQueryParameter("api_key", FlickrConstants.API_KEY)
+                .addQueryParameter("lat", latitude)
+                .addQueryParameter("lon", longitude)
+                .addQueryParameter("per_page", FlickrConstants.NUMBER_OF_PHOTOS)
+                .addQueryParameter("format", FlickrConstants.FORMAT_TYPE)
+                .addQueryParameter("privacy_filter", FlickrConstants.PRIVACY_FILTER)
+                .addQueryParameter("nojsoncallback", FlickrConstants.JSON_CALLBACK)
+                .build();
+        return flickrSearchUrl;
     }
 
     public static String getPhotoUrlForSize(FlickrPhotoSize size, JSONObject photoJsonObject) throws JSONException {

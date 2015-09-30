@@ -1,15 +1,14 @@
 import com.sparkwing.localview.FlickrConstants
-import com.sparkwing.localview.FlickrPhotoUtils
+import com.sparkwing.localview.FlickrApiUtils
 import org.json.JSONObject
 import org.robolectric.annotation.Config
 import pl.polidea.robospock.RoboSpecification
-import spock.lang.Shared
 import spock.lang.Unroll
 
 import static org.robolectric.annotation.Config.NONE
 
 @Config(manifest=NONE)
-class FlickrPhotoUtilsSpec extends RoboSpecification {
+class FlickrApiUtilsSpec extends RoboSpecification {
 
     @Unroll
     def "test get photo url sizes"() {
@@ -21,7 +20,7 @@ class FlickrPhotoUtilsSpec extends RoboSpecification {
                 .put("secret", "4")
 
         expect:
-        FlickrPhotoUtils.getPhotoUrlForSize(photoSize, jsonObject) == url
+        FlickrApiUtils.getPhotoUrlForSize(photoSize, jsonObject) == url
 
         where:
         photoSize                         |  url
@@ -33,7 +32,7 @@ class FlickrPhotoUtilsSpec extends RoboSpecification {
     def "test get photo url null"() {
 
         expect:
-        FlickrPhotoUtils.getPhotoUrlForSize(FlickrConstants.SMALL_IMAGE_SIZE, jsonObject) == url
+        FlickrApiUtils.getPhotoUrlForSize(FlickrConstants.SMALL_IMAGE_SIZE, jsonObject) == url
 
         where:
         jsonObject ||   url
@@ -44,7 +43,7 @@ class FlickrPhotoUtilsSpec extends RoboSpecification {
     def "test unpackSearchResults"() {
 
         expect:
-        def flickrPhotoList = FlickrPhotoUtils.unpackSearchResult(fileContents)
+        def flickrPhotoList = FlickrApiUtils.unpackSearchResult(fileContents)
         listSize == flickrPhotoList.size()
 
         where:
