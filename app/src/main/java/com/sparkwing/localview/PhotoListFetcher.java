@@ -24,8 +24,6 @@ public class PhotoListFetcher extends AsyncTask<String, Integer, String> {
 
     private static final String TAG = PhotoListFetcher.class.getSimpleName();
 
-    private List<FlickrPhoto> mFlickrPhotoList;
-
     private PhotoListFetcherListener mPhotoListFetcherListener;
 
     public void setPhotoListFetcherListener(PhotoListFetcherListener mPhotoListFetcherListener) {
@@ -67,33 +65,9 @@ public class PhotoListFetcher extends AsyncTask<String, Integer, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        unPackSearchResult(result);
-        this.mPhotoListFetcherListener.onPhotoListFetched(this.mFlickrPhotoList);
+        List<FlickrPhoto> flickrPhotoList = FlickrPhotoUtils.unpackSearchResult(result);
+        this.mPhotoListFetcherListener.onPhotoListFetched(flickrPhotoList);
 
     }
 
-    private void unPackSearchResult(String searchResult) {
-        mFlickrPhotoList = new ArrayList<FlickrPhoto>();
-        try {
-            JSONObject searchResultJsonObject = new JSONObject(searchResult);
-            JSONObject photosJsonObject = searchResultJsonObject.getJSONObject("photos");
-            JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
-            Log.d(TAG, "We retrieved " + photoJsonArray.length() + " photos");
-            for (int i = 0; i < photoJsonArray.length(); i++) {
-                JSONObject photoJsonObject = photoJsonArray.getJSONObject(i);
-
-                String title = photoJsonObject.getString("title");
-                if (title.length() == 0 || title == null) {
-                    title = "";
-                }
-                String smallImageUrl = FlickrPhotoUtils.getPhotoUrlForSize(FlickrConstants.SMALL_IMAGE_SIZE, photoJsonObject);
-                String bigImageUrl = FlickrPhotoUtils.getPhotoUrlForSize(FlickrConstants.BIG_IMAGE_SIZE, photoJsonObject);
-                FlickrPhoto flickrPhoto = new FlickrPhoto(title, smallImageUrl, bigImageUrl);
-                mFlickrPhotoList.add(flickrPhoto);
-            }
-        } catch (JSONException jsonException) {
-            Log.e(TAG, "malformed json response encountered in flickr search result");
-        }
-
-    }
 }
