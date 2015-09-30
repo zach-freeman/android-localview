@@ -12,5 +12,3 @@ This project was developed with Android Studio. It should open just fine with th
 * [Fresco](https://github.com/facebook/fresco)
 * [RoboSpock](http://robospock.org)
 
-### To-Do ###
-* Handle landscape rotation in the full image view. Currently, we lock the orientation to portrait
