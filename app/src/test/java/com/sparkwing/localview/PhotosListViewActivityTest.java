@@ -6,19 +6,14 @@ import android.widget.ProgressBar;
 
 import org.fest.assertions.api.ANDROID;
 import org.fest.assertions.api.Assertions;
-import org.fest.assertions.api.android.widget.ProgressBarAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowProgressBar;
 import org.robolectric.util.ActivityController;
 
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.fest.assertions.api.ANDROID.*;
-import org.fest.assertions.api.Assertions.*;
 
 @RunWith(LocalviewTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
