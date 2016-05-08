@@ -17,6 +17,9 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import java.util.ArrayList;
 import java.util.List;
 
+import roboguice.RoboGuice;
+import roboguice.inject.RoboInjector;
+
 public class PhotosListViewActivity extends AppCompatActivity implements PhotoListManagerListener, AdapterView.OnItemClickListener {
 
     private static final String TAG = PhotosListViewActivity.class.getSimpleName();
@@ -25,6 +28,11 @@ public class PhotosListViewActivity extends AppCompatActivity implements PhotoLi
     private Parcelable mPhotoListState = null;
     ListView mPhotoListView;
     private List<FlickrPhoto> mFlickrPhotoList = new ArrayList<FlickrPhoto>();
+
+    public ProgressBar getProgressBarSpinner() {
+        return mProgressBarSpinner;
+    }
+
     private ProgressBar mProgressBarSpinner;
 
     @Override
