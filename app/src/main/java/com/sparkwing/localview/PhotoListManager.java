@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Location;
 import android.widget.Toast;
 
+import com.google.inject.Inject;
+
 import java.util.List;
 
 /**
@@ -11,20 +13,28 @@ import java.util.List;
  */
 public class PhotoListManager implements LocationUpdaterListener, PhotoListFetcherListener {
     private static final String TAG = PhotoListManager.class.getSimpleName();
-    private Boolean mPhotoListFetched;
 
-    public void setPhotoListManagerListener(PhotoListManagerListener mPhotoListManagerListener) {
-        this.mPhotoListFetched = false;
-        this.mPhotoListManagerListener = mPhotoListManagerListener;
+    public Boolean getPhotoListFetched() {
+        return mPhotoListFetched;
     }
 
+    private Boolean mPhotoListFetched;
+    private LocationUpdater mLocationUpdater;
     private PhotoListManagerListener mPhotoListManagerListener;
 
-    public PhotoListManager(Context context) {
+    public void setPhotoListManagerListener(PhotoListManagerListener mPhotoListManagerListener) {
+        this.mPhotoListManagerListener = mPhotoListManagerListener;
+        this.mLocationUpdater.startLocationUpdates();
+    }
 
+
+
+    @Inject
+    public PhotoListManager(Context context) {
+        this.mPhotoListFetched = false;
+        this.mLocationUpdater = new LocationUpdater(context);
         if (Reachability.isConnected(context)) {
-            LocationUpdater locationUpdater = new LocationUpdater(context);
-            locationUpdater.setLocationUpdaterListener(this);
+            this.mLocationUpdater.setLocationUpdaterListener(this);
         } else {
             Toast.makeText(context,
                     "Network Unavailable", Toast.LENGTH_LONG).show();

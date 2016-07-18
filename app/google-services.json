@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "547053276665",
+    "project_id": "firebase-localview"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547053276665:android:61fbcdd6576a01aa",
+        "android_client_info": {
+          "package_name": "com.sparkwing.localview"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBWlN8d3lz4C57qdb3VAS5Zm7TTiW5tXE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-80580327-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
