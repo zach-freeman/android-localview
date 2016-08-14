@@ -1,30 +1,68 @@
 package com.sparkwing.localview;
 
-import android.content.Intent;
+import android.Manifest;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.google.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotosListViewActivity extends AppCompatActivity implements PhotoListManagerListener, AdapterView.OnItemClickListener {
+import roboguice.activity.RoboActionBarActivity;
+
+public class PhotosListViewActivity extends RoboActionBarActivity implements PhotoListManagerListener{
 
     private static final String TAG = PhotosListViewActivity.class.getSimpleName();
     private static final String SAVE_PHOTO_LIST_KEY = "photo-list";
     private static final String PHOTO_LIST_STATE_KEY = "photo-list-state";
     private Parcelable mPhotoListState = null;
-    ListView mPhotoListView;
+
+    @Inject public RequestPermissionUtils requestPermissionUtils;
+
+    public RequestPermissionUtils.RequestPermissionCallback requestPermissionCallback = new RequestPermissionUtils.RequestPermissionCallback() {
+        @Override
+        public void Granted(int requestCode) {
+            Log.d(TAG, "permission granted");
+            startPhotoListManager();
+        }
+
+        @Override
+        public void Denied(int requestCode) {
+
+        }
+    };
+    @Inject PhotoListManager mPhotoListManager;
+
+    RecyclerView mPhotoRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
+    public RecyclerView getPhotoRecyclerView() {
+        return mPhotoRecyclerView;
+    }
+
     private List<FlickrPhoto> mFlickrPhotoList = new ArrayList<FlickrPhoto>();
+
+    public List<FlickrPhoto> getFlickrPhotoList() {
+        return mFlickrPhotoList;
+    }
+
+    public void setFlickrPhotoList(List<FlickrPhoto> mFlickrPhotoList) {
+        this.mFlickrPhotoList = mFlickrPhotoList;
+    }
+
+    public ProgressBar getProgressBarSpinner() {
+        return mProgressBarSpinner;
+    }
+
     private ProgressBar mProgressBarSpinner;
 
     @Override
@@ -33,22 +71,43 @@ public class PhotosListViewActivity extends AppCompatActivity implements PhotoLi
         Fresco.initialize(this);
         setContentView(R.layout.activity_photos_list_view);
         mProgressBarSpinner = (ProgressBar)findViewById(R.id.progressBarSpinner);
-        mPhotoListView = (ListView) findViewById(R.id.listView);
+        mPhotoRecyclerView = (RecyclerView) findViewById(R.id.listView);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mPhotoRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mPhotoRecyclerView.setLayoutManager(mLayoutManager);
 
         if (savedInstanceState != null) {
             this.mFlickrPhotoList = savedInstanceState.getParcelableArrayList(SAVE_PHOTO_LIST_KEY);
             this.mPhotoListState = savedInstanceState.getParcelable(PHOTO_LIST_STATE_KEY);
             setupPhotoList();
         } else {
-            this.startPhotoListManager();
+            this.requestLocationPermission();
         }
 
     }
 
+    protected void requestLocationPermission() {
+        requestPermissionUtils.requestPermission(this, Manifest.permission.ACCESS_FINE_LOCATION, requestPermissionCallback, Constants.MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+    }
+
     protected void startPhotoListManager() {
-        this.mProgressBarSpinner.setVisibility(View.VISIBLE);
-        PhotoListManager photoListManager = new PhotoListManager(this);
-        photoListManager.setPhotoListManagerListener(this);
+        mProgressBarSpinner.setVisibility(View.VISIBLE);
+        boolean photoListFetched = mPhotoListManager.getPhotoListFetched();
+        mPhotoListManager.setPhotoListManagerListener(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[],
+                                           int[] grantResults) {
+        requestPermissionUtils.onRequestPermissionsResult(requestPermissionCallback,
+                requestCode,
+                permissions,
+                grantResults);
     }
 
     @Override
@@ -61,7 +120,7 @@ public class PhotosListViewActivity extends AppCompatActivity implements PhotoLi
         super.onResume();
         this.mProgressBarSpinner.setVisibility(View.INVISIBLE);
         if (this.mPhotoListState != null) {
-            this.mPhotoListView.onRestoreInstanceState(this.mPhotoListState);
+            this.mPhotoRecyclerView.getLayoutManager().onRestoreInstanceState(this.mPhotoListState);
         }
         this.mPhotoListState = null;
     }
@@ -71,7 +130,7 @@ public class PhotosListViewActivity extends AppCompatActivity implements PhotoLi
     protected void onDestroy() {
         // onDestroy gets called when back button is tapped
         super.onDestroy();
-        this.mPhotoListState = this.mPhotoListView.onSaveInstanceState();
+        this.mPhotoListState = this.mPhotoRecyclerView.getLayoutManager().onSaveInstanceState();
 
     }
 
@@ -105,7 +164,7 @@ public class PhotosListViewActivity extends AppCompatActivity implements PhotoLi
         ArrayList<FlickrPhoto> listOfPhotos = new ArrayList<>(this.mFlickrPhotoList.size());
         listOfPhotos.addAll(this.mFlickrPhotoList);
         outState.putParcelableArrayList(SAVE_PHOTO_LIST_KEY, listOfPhotos);
-        this.mPhotoListState = this.mPhotoListView.onSaveInstanceState();
+        this.mPhotoListState = this.mPhotoRecyclerView.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(PHOTO_LIST_STATE_KEY, this.mPhotoListState);
         super.onSaveInstanceState(outState);
     }
@@ -122,12 +181,11 @@ public class PhotosListViewActivity extends AppCompatActivity implements PhotoLi
 
 
     protected void setupPhotoList() {
-        PhotoListAdapter photoListAdapter = new PhotoListAdapter(this, this.mFlickrPhotoList);
-        this.mPhotoListView.setAdapter(photoListAdapter);
+        PhotoListAdapter photoListAdapter = new PhotoListAdapter(this.mFlickrPhotoList);
+        this.mPhotoRecyclerView.setAdapter(photoListAdapter);
         if (this.mPhotoListState != null) {
-            this.mPhotoListView.onRestoreInstanceState(this.mPhotoListState);
+            this.mPhotoRecyclerView.getLayoutManager().onRestoreInstanceState(this.mPhotoListState);
         }
-        this.mPhotoListView.setOnItemClickListener(this);
     }
 
     @Override
@@ -142,13 +200,4 @@ public class PhotosListViewActivity extends AppCompatActivity implements PhotoLi
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent fullPhotoViewIntent = new Intent(this, PhotoFullScreenActivity.class);
-        FlickrPhoto flickrPhoto = this.mFlickrPhotoList.get(position);
-        Bundle fullPhotoViewBundle = new Bundle();
-        fullPhotoViewBundle.putParcelable(FlickrPhoto.BUNDLE_KEY, flickrPhoto);
-        fullPhotoViewIntent.putExtras(fullPhotoViewBundle);
-        startActivity(fullPhotoViewIntent);
-    }
 }
