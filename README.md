@@ -10,5 +10,5 @@ This project was developed with Android Studio. It should open just fine with th
 ### Dependencies ###
 * [OkHttp](http://square.github.io/okhttp/)
 * [Fresco](https://github.com/facebook/fresco)
-* [RoboSpock](http://robospock.org)
+* [Robolectric](http://robolectric.org/)
 
