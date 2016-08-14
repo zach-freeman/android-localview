@@ -3,6 +3,7 @@ package com.sparkwing.localview;
 
 import android.Manifest;
 import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -83,7 +84,7 @@ public class PhotosListViewActivityTest {
 
     @Test
     public void testOnCreate_setsUpPhotoListView() {
-        ANDROID.assertThat(subject.getPhotoListView()).isNotNull();
+        ANDROID.assertThat(subject.getPhotoRecyclerView()).isNotNull();
     }
 
     @Test
@@ -112,7 +113,13 @@ public class PhotosListViewActivityTest {
 
     @Test
     public void testOnItemClick_startsFullPhotoViewIntent() {
-        subject.onItemClick(null, null, 0, 1);
+        subject.setupPhotoList();
+        RecyclerView recyclerView = subject.getPhotoRecyclerView();
+        recyclerView.measure(0,0);
+        recyclerView.layout(0,0,100,1000);
+        RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(0);
+        View view = viewHolder.itemView;
+        view.performClick();
         Intent expectedIntent = new Intent(subject, PhotoFullScreenActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(subject);
         Intent actualIntent = shadowActivity.getNextStartedActivity();
