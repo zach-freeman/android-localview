@@ -16,6 +16,8 @@ public class LocalviewApplication extends Application {
     }
 
     protected void setBaseInjector() {
-        RoboGuice.overrideApplicationInjector(this, new LocalviewApplicationModule());
+        LocalviewApplicationModule  applicationModule = new LocalviewApplicationModule();
+        RoboGuice.overrideApplicationInjector(this, applicationModule);
+        applicationModule.configure();
     }
 }

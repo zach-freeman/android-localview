@@ -25,12 +25,10 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.View
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public FlickrPhoto mFlickrPhoto;
         public SimpleDraweeView mSmallImageView;
-        public TextView mTitleCommentView;
         public ViewHolder(View view) {
             super(view);
             view.setOnClickListener(this);
             mSmallImageView = (SimpleDraweeView) view.findViewById(R.id.smallImageView);
-            mTitleCommentView = (TextView) view.findViewById(R.id.titleComment);
         }
 
         public void setFlickrPhoto(FlickrPhoto flickrPhoto) {
@@ -73,11 +71,6 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.View
         holder.setFlickrPhoto(flickrPhoto);
         Uri smallImageUri = Uri.parse(flickrPhoto.getSmallImageUrl());
         holder.mSmallImageView.setImageURI(smallImageUri);
-        String titleString = flickrPhoto.getTitleComment();
-        if (titleString.isEmpty()) {
-            titleString = "Title not available";
-        }
-        holder.mTitleCommentView.setText(titleString);
 
     }
 

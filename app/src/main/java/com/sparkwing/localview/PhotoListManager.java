@@ -8,6 +8,8 @@ import com.google.inject.Inject;
 
 import java.util.List;
 
+import roboguice.RoboGuice;
+
 /**
  * Created by zachfreeman on 9/19/15.
  */
@@ -19,7 +21,7 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
     }
 
     private Boolean mPhotoListFetched;
-    private LocationUpdater mLocationUpdater;
+    @Inject private LocationUpdater mLocationUpdater;
     private PhotoListManagerListener mPhotoListManagerListener;
 
     public void setPhotoListManagerListener(PhotoListManagerListener mPhotoListManagerListener) {
@@ -27,10 +29,9 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
         this.mLocationUpdater.startLocationUpdates();
     }
 
-
-
     @Inject
     public PhotoListManager(Context context) {
+        RoboGuice.getInjector(context).injectMembers(this);
         this.mPhotoListFetched = false;
         this.mLocationUpdater = new LocationUpdater(context);
         if (Reachability.isConnected(context)) {
@@ -54,6 +55,8 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
     @Override
     public void onPhotoListFetched(List<FlickrPhoto> photoList) {
         this.mPhotoListFetched = true;
-        this.mPhotoListManagerListener.photoListManagerDidFinish(photoList);
+        if (this.mPhotoListManagerListener != null) {
+            this.mPhotoListManagerListener.photoListManagerDidFinish(photoList);
+        }
     }
 }

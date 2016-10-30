@@ -71,22 +71,21 @@ public class LocationUpdater
     @Override
     public void onConnected(Bundle bundle) {
         this.mGoogleApiClientStatus = GoogleApiClientStatus.CONNECTION_SUCCESS;
+        startLocationUpdates();
     }
 
     public void startLocationUpdates() {
-        Log.d(TAG, "startLocationUpdates");
+        mRequestPermissionUtils = new RequestPermissionUtils();
         int permissionCheck = mRequestPermissionUtils.checkPermission(this.mContext, Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED &&
-                this.mGoogleApiClientStatus.equals(GoogleApiClientStatus.CONNECTION_SUCCESS)) {
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             try {
                 LocationServices.FusedLocationApi.requestLocationUpdates(
                         mGoogleApiClient, mLocationRequest, this);
             } catch (IllegalStateException illegalStateException) {
-                Log.d(TAG, "google api client not connected yet");
+                Log.d(TAG, "google api client not connected");
             }
         } else {
-            Toast.makeText(this.mContext,
-                    "Unable to get location", Toast.LENGTH_LONG).show();
+            Toast.makeText(this.mContext, "Permission not granted", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -111,8 +110,9 @@ public class LocationUpdater
         this.mCurrentLocation = location;
         this.mRequestingLocationUpdates = false;
         this.stopLocationUpdates();
-        this.mLocationUpdaterListener.locationAvailable(this.mCurrentLocation);
-
+        if (this.mLocationUpdaterListener != null) {
+            this.mLocationUpdaterListener.locationAvailable(this.mCurrentLocation);
+        }
     }
 
     public String getGoogleApiClientStatus() {
