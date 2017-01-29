@@ -4,7 +4,7 @@ package com.sparkwing.localview;
  * Created by zachfreeman on 9/12/15.
  */
 public class FlickrConstants {
-    public static final String API_KEY = "yourFlickrApiKey";
+    public static final String API_KEY = "yourApiKey";
     public static final String HTTP_SCHEME = "https";
     public static final String API_HOST = "api.flickr.com";
     public static final String SERVICE_PATH = "services";

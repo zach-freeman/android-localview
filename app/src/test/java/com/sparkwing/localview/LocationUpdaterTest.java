@@ -60,7 +60,7 @@ public class LocationUpdaterTest {
         Toast actualToast = ShadowToast.getLatestToast();
         Assertions.assertThat(actualToast).isNotNull();
         String actualToastText = ShadowToast.getTextOfLatestToast();
-        Assertions.assertThat(actualToastText).isEqualTo("Google Api Client Not connected");
+        Assertions.assertThat(actualToastText).isEqualTo("Permission not granted");
 
     }
 }

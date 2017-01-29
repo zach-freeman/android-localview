@@ -22,6 +22,7 @@ import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.sparkwing.localview.Models.Photo;
 
 /**
  * Created by zachfreeman on 9/19/15.
@@ -33,7 +34,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity implements Contro
     private SimpleDraweeView mFullImageView;
     private TextView mTitleTextView;
     Animation mSlideAnimation;
-    FlickrPhoto mFlickrPhoto;
+    Photo mFlickrPhoto;
 
     private boolean mShouldAnimateImage;
     private boolean mIsTabletSize;
@@ -100,8 +101,12 @@ public class PhotoFullScreenActivity extends AppCompatActivity implements Contro
         }
     }
 
-    protected void setupFullImageView(FlickrPhoto flickrPhoto) {
-        String bigImageUrl = flickrPhoto.getBigImageUrl();
+    protected void setupFullImageView(Photo flickrPhoto) {
+        String bigImageUrl = FlickrApiUtils.getPhotoUrl(FlickrApiUtils.FlickrPhotoSize.PhotoSizeLarge1024,
+                flickrPhoto.getId(),
+                flickrPhoto.getServer(),
+                flickrPhoto.getFarm().toString(),
+                flickrPhoto.getSecret());
         Uri uri = Uri.parse(bigImageUrl);
         PointF focusPoint = new PointF(0.0f, 0.0f);
         ScalingUtils.ScaleType actualImageScaleType = ScalingUtils.ScaleType.CENTER;
@@ -127,9 +132,9 @@ public class PhotoFullScreenActivity extends AppCompatActivity implements Contro
 
     }
 
-    protected void setupTitleTextView(FlickrPhoto flickrPhoto) {
+    protected void setupTitleTextView(Photo flickrPhoto) {
 
-        String titleComment = flickrPhoto.getTitleComment();
+        String titleComment = flickrPhoto.getTitle();
         if (titleComment.isEmpty() || null == titleComment) {
             titleComment = "No title available";
         }

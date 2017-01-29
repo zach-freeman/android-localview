@@ -41,14 +41,14 @@ public class LocationUpdater
     @Inject
     public LocationUpdater(Context context) {
         this.mContext = context;
-        RoboGuice.getInjector(context).injectMembers(this);
-        this.mRequestingLocationUpdates = true;
+        RoboGuice.getInjector(this.mContext).injectMembers(this);
         this.mGoogleApiClientStatus = GoogleApiClientStatus.CONNECTION_UNKNOWN;
         setupLocationService();
     }
 
-    private void setupLocationService() {
+    public void setupLocationService() {
         this.buildGoogleApiClient();
+        this.mRequestingLocationUpdates = true;
         mGoogleApiClient.connect();
         this.createLocationRequest();
     }
@@ -83,6 +83,7 @@ public class LocationUpdater
                         mGoogleApiClient, mLocationRequest, this);
             } catch (IllegalStateException illegalStateException) {
                 Log.d(TAG, "google api client not connected");
+                Log.d(TAG, illegalStateException.getLocalizedMessage());
             }
         } else {
             Toast.makeText(this.mContext, "Permission not granted", Toast.LENGTH_LONG).show();
@@ -108,9 +109,9 @@ public class LocationUpdater
     @Override
     public void onLocationChanged(Location location) {
         this.mCurrentLocation = location;
-        this.mRequestingLocationUpdates = false;
-        this.stopLocationUpdates();
+        //this.stopLocationUpdates();
         if (this.mLocationUpdaterListener != null) {
+            this.mRequestingLocationUpdates = false;
             this.mLocationUpdaterListener.locationAvailable(this.mCurrentLocation);
         }
     }

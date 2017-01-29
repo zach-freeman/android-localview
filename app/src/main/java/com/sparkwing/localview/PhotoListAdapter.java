@@ -1,7 +1,5 @@
 package com.sparkwing.localview;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,10 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.sparkwing.localview.Models.Photo;
 
 import java.util.List;
 
@@ -20,10 +17,10 @@ import java.util.List;
  * Created by zachfreeman on 9/12/15.
  */
 public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.ViewHolder> {
-    private List<FlickrPhoto> mFlickrPhotoList;
+    private List<Photo> mFlickrPhotoList;
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public FlickrPhoto mFlickrPhoto;
+        public Photo mFlickrPhoto;
         public SimpleDraweeView mSmallImageView;
         public ViewHolder(View view) {
             super(view);
@@ -31,7 +28,7 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.View
             mSmallImageView = (SimpleDraweeView) view.findViewById(R.id.smallImageView);
         }
 
-        public void setFlickrPhoto(FlickrPhoto flickrPhoto) {
+        public void setFlickrPhoto(Photo flickrPhoto) {
             mFlickrPhoto = flickrPhoto;
         }
 
@@ -46,7 +43,7 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.View
     }
 
 
-    public PhotoListAdapter(List<FlickrPhoto> flickrPhotoList) {
+    public PhotoListAdapter(List<Photo> flickrPhotoList) {
         this.mFlickrPhotoList = flickrPhotoList;
     }
 
@@ -67,9 +64,13 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        FlickrPhoto flickrPhoto = mFlickrPhotoList.get(position);
+        Photo flickrPhoto = mFlickrPhotoList.get(position);
         holder.setFlickrPhoto(flickrPhoto);
-        Uri smallImageUri = Uri.parse(flickrPhoto.getSmallImageUrl());
+        Uri smallImageUri = Uri.parse(FlickrApiUtils.getPhotoUrl(FlickrApiUtils.FlickrPhotoSize.PhotoSizeSmallSquare75,
+                flickrPhoto.getId(),
+                flickrPhoto.getServer(),
+                flickrPhoto.getFarm().toString(),
+                flickrPhoto.getSecret()));
         holder.mSmallImageView.setImageURI(smallImageUri);
 
     }
