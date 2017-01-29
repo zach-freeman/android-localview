@@ -52,7 +52,7 @@ public class PhotoFullScreenActivity extends AppCompatActivity implements Contro
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         Bundle bundle = getIntent().getExtras();
-        mFlickrPhoto = bundle.getParcelable(FlickrPhoto.BUNDLE_KEY);
+        mFlickrPhoto = bundle.getParcelable(FlickrConstants.BUNDLE_KEY);
 
         mShouldAnimateImage = true;
         mIsTabletSize = getResources().getBoolean(R.bool.isTablet);

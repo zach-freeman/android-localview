@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.sparkwing.localview.Models.Photo;
 import com.sparkwing.localview.util.MockInject;
 
 import org.fest.assertions.api.ANDROID;
@@ -57,7 +58,12 @@ public class PhotosListViewActivityTest {
                 return null;
             }
         }).when(mRequestPermissionUtils).requestPermission(subject, Manifest.permission.ACCESS_FINE_LOCATION, subject.requestPermissionCallback, Constants.MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        flickrPhotoList = new ArrayList<FlickrPhoto> (Arrays.asList(new FlickrPhoto("some-photo", "some-small-url", "some-big-url")));
+        Photo somePhoto = new Photo();
+        somePhoto.setId("some-photo-id");
+        somePhoto.setFarm(1);
+        somePhoto.setServer("some-server");
+        somePhoto.setSecret("shhh");
+        flickrPhotoList = new ArrayList<Photo> (Arrays.asList(somePhoto));
         subject.setFlickrPhotoList(flickrPhotoList);
         activityController.create().start();
     }
@@ -89,7 +95,7 @@ public class PhotosListViewActivityTest {
 
     @Test
     public void testPhotoListManagerDidFinish_withNoPhotos_ShowsToast() {
-        List emptyFlickrPhotoList = new ArrayList<FlickrPhoto> ();
+        List emptyFlickrPhotoList = new ArrayList<Photo> ();
         subject.photoListManagerDidFinish(emptyFlickrPhotoList);
         Toast actualToast = ShadowToast.getLatestToast();
         Assertions.assertThat(actualToast).isNotNull();

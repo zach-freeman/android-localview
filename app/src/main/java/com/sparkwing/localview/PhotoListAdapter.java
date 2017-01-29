@@ -36,7 +36,7 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.View
         public void onClick(View v) {
             Intent fullPhotoViewIntent = new Intent(v.getContext(), PhotoFullScreenActivity.class);
             Bundle fullPhotoViewBundle = new Bundle();
-            fullPhotoViewBundle.putParcelable(FlickrPhoto.BUNDLE_KEY, mFlickrPhoto);
+            fullPhotoViewBundle.putParcelable(FlickrConstants.BUNDLE_KEY, mFlickrPhoto);
             fullPhotoViewIntent.putExtras(fullPhotoViewBundle);
             v.getContext().startActivity(fullPhotoViewIntent);
         }
