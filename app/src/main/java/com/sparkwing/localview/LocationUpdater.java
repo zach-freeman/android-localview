@@ -74,7 +74,6 @@ public class LocationUpdater
     }
 
     public void startLocationUpdates() {
-        mRequestPermissionUtils = new RequestPermissionUtils();
         int permissionCheck = mRequestPermissionUtils.checkPermission(this.mContext, Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             try {

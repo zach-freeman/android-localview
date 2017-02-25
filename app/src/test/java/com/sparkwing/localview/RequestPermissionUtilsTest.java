@@ -14,13 +14,14 @@ import org.mockito.MockitoAnnotations;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import static org.mockito.Mockito.mock;
+
 
 @RunWith(LocalviewTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21, manifest = "../app/src/main/AndroidManifest.xml")
 public class RequestPermissionUtilsTest {
 
     RequestPermissionUtils subject;
-    @MockInject
     RequestPermissionUtils.RequestPermissionCallback mRequestPermissionCallback;
     Context mContext;
 
@@ -28,6 +29,7 @@ public class RequestPermissionUtilsTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         mContext = RuntimeEnvironment.application;
+        mRequestPermissionCallback = mock(RequestPermissionUtils.RequestPermissionCallback.class);
         subject = new RequestPermissionUtils();
         Mockito.spy(subject);
     }
