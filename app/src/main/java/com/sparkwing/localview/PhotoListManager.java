@@ -5,19 +5,18 @@ import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.inject.Inject;
 import com.sparkwing.localview.Models.FlickrPhotoSearch;
 import com.sparkwing.localview.Models.Photo;
-import com.sparkwing.localview.Models.Photos;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import roboguice.RoboGuice;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -34,7 +33,8 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
     }
 
     private Boolean mPhotoListFetched;
-    @Inject private LocationUpdater mLocationUpdater;
+    @Inject
+    LocationUpdater mLocationUpdater;
     private PhotoListManagerListener mPhotoListManagerListener;
 
     public void setPhotoListManagerListener(PhotoListManagerListener mPhotoListManagerListener) {
@@ -43,9 +43,8 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
         this.mLocationUpdater.setupLocationService();
     }
 
-    @Inject
     public PhotoListManager(Context context) {
-        RoboGuice.getInjector(context).injectMembers(this);
+        ((LocalviewApplication) context.getApplicationContext()).getLocationUpdaterComponent().inject(this);
         this.mPhotoListFetched = false;
         //this.mLocationUpdater = new LocationUpdater(context);
         if (Reachability.isConnected(context)) {
@@ -110,7 +109,7 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
         if (this.mPhotoListManagerListener != null) {
             this.mPhotoListManagerListener.photoListManagerDidFinish(photoList);
         } else {
-            Log.d(TAG, "not doing shit");
+            Log.d(TAG, "not doing anything");
         }
     }
 }

@@ -3,6 +3,7 @@ package com.sparkwing.localview;
 import android.Manifest;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,23 +15,22 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.google.inject.Inject;
 import com.sparkwing.localview.Models.Photo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import roboguice.RoboGuice;
-import roboguice.activity.RoboActionBarActivity;
+import javax.inject.Inject;
 
-public class PhotosListViewActivity extends RoboActionBarActivity implements PhotoListManagerListener{
+public class PhotosListViewActivity extends ActionBarActivity implements PhotoListManagerListener{
 
     private static final String TAG = PhotosListViewActivity.class.getSimpleName();
     private static final String SAVE_PHOTO_LIST_KEY = "photo-list";
     private static final String PHOTO_LIST_STATE_KEY = "photo-list-state";
     private Parcelable mPhotoListState = null;
     private ViewSwitcher switcher;
-    @Inject public RequestPermissionUtils requestPermissionUtils;
+    @Inject
+    public RequestPermissionUtils requestPermissionUtils;
 
     public RequestPermissionUtils.RequestPermissionCallback requestPermissionCallback = new RequestPermissionUtils.RequestPermissionCallback() {
         @Override
@@ -70,10 +70,11 @@ public class PhotosListViewActivity extends RoboActionBarActivity implements Pho
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((LocalviewApplication) getApplication()).getRequestPermissionUtilsComponent().inject(this);
+        ((LocalviewApplication) getApplication()).getPhotoListManagerComponent().inject(this);
         super.onCreate(savedInstanceState);
         Fresco.initialize(this);
         setContentView(R.layout.activity_photos_list_view);
-        RoboGuice.getInjector(this).injectMembers(this);
         switcher = (ViewSwitcher) findViewById(R.id.ViewSwitcher);
         switcher.showNext();
         mProgressBarSpinner = (ProgressBar)findViewById(R.id.progressBarSpinner);

@@ -13,9 +13,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.inject.Inject;
 
-import roboguice.RoboGuice;
+import javax.inject.Inject;
 
 /**
  * Created by zachfreeman on 9/19/15.
@@ -41,7 +40,7 @@ public class LocationUpdater
     @Inject
     public LocationUpdater(Context context) {
         this.mContext = context;
-        RoboGuice.getInjector(this.mContext).injectMembers(this);
+        ((LocalviewApplication) context).getRequestPermissionUtilsComponent().inject(this);
         this.mGoogleApiClientStatus = GoogleApiClientStatus.CONNECTION_UNKNOWN;
         setupLocationService();
     }

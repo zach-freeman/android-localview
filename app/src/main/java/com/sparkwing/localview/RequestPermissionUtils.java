@@ -7,8 +7,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.google.inject.Inject;
-
 /**
  * Created by zsfree00 on 7/11/16.
  */
@@ -21,7 +19,6 @@ public class RequestPermissionUtils {
 
     }
 
-    @Inject
     public RequestPermissionUtils() {
 
     }

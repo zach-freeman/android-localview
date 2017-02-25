@@ -1,15 +1,40 @@
 package com.sparkwing.localview;
 
-import com.sparkwing.localview.Providers.LocationUpdaterProvider;
-import com.sparkwing.localview.Providers.RequestPermissionUtilsProvider;
+
+import org.mockito.Mockito;
+import org.robolectric.RuntimeEnvironment;
+
+import javax.inject.Singleton;
+
+import dagger.Module;
+import dagger.Provides;
 
 /**
  * Created by zachfreeman on 5/9/16.
  */
+@Module
 public class LocalviewTestApplicationModule extends LocalviewApplicationModule {
-    @Override
-    protected void configure() {
-        bind(RequestPermissionUtils.class).toProvider(RequestPermissionUtilsProvider.class);
-        bind(LocationUpdater.class).toProvider(LocationUpdaterProvider.class);
+
+    public LocalviewTestApplicationModule() {
+        super(RuntimeEnvironment.application);
     }
+
+    @Provides
+    @Singleton
+    PhotoListManager providePhotoListManager() {
+        return Mockito.mock(PhotoListManager.class);
+    }
+
+    @Provides
+    @Singleton
+    LocationUpdater provideLocationUpdater() {
+        return Mockito.mock(LocationUpdater.class);
+    }
+
+    @Provides
+    @Singleton
+    RequestPermissionUtils provideRequestPermissionUtils() {
+        return Mockito.mock(RequestPermissionUtils.class);
+    }
+
 }

@@ -2,9 +2,9 @@ package com.sparkwing.localview.util;
 
 import android.content.Context;
 
-import com.google.inject.Inject;
 import com.sparkwing.localview.PhotoListManager;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
