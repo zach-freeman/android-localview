@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
-import com.sparkwing.localview.util.MockInject;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

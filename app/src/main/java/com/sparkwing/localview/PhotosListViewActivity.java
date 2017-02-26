@@ -105,7 +105,6 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
     protected void startPhotoListManager() {
         switcher.setDisplayedChild(0);
         mProgressBarSpinner.setVisibility(View.VISIBLE);
-        boolean photoListFetched = mPhotoListManager.getPhotoListFetched();
         mPhotoListManager.setPhotoListManagerListener(this);
     }
 
