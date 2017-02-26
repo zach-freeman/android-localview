@@ -2,7 +2,10 @@ package com.sparkwing.localview;
 
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -32,7 +35,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.spy;
 
 @RunWith(LocalviewTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21, manifest = "../app/src/main/AndroidManifest.xml")
@@ -55,6 +63,7 @@ public class PhotosListViewActivityTest {
         flickrPhotoList = new ArrayList<Photo> (Arrays.asList(somePhoto));
         subject.setFlickrPhotoList(flickrPhotoList);
         activityController.create().start();
+        spy(subject);
     }
 
     @Test
@@ -72,9 +81,8 @@ public class PhotosListViewActivityTest {
     }
 
     @Test
-    public void testOnCreate_callsSetPhotoListManager() {
-
-        //Mockito.verify(subject.mPhotoListManager).setPhotoListManagerListener(subject);
+    public void testOnCreate_callsSetPhotoListManagerListener() {
+        Mockito.verify(subject.mPhotoListManager).setPhotoListManagerListener(subject);
     }
 
     @Test

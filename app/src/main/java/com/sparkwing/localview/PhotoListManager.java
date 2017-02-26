@@ -112,4 +112,5 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
             Log.d(TAG, "not doing anything");
         }
     }
+
 }
