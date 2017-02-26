@@ -3,7 +3,8 @@ package com.sparkwing.localview;
 import android.Manifest;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -11,23 +12,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.google.inject.Inject;
+import com.sparkwing.localview.Models.Photo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import roboguice.activity.RoboActionBarActivity;
+import javax.inject.Inject;
 
-public class PhotosListViewActivity extends RoboActionBarActivity implements PhotoListManagerListener{
+public class PhotosListViewActivity extends ActionBarActivity implements PhotoListManagerListener{
 
     private static final String TAG = PhotosListViewActivity.class.getSimpleName();
     private static final String SAVE_PHOTO_LIST_KEY = "photo-list";
     private static final String PHOTO_LIST_STATE_KEY = "photo-list-state";
     private Parcelable mPhotoListState = null;
-
-    @Inject public RequestPermissionUtils requestPermissionUtils;
+    private ViewSwitcher switcher;
+    @Inject
+    public RequestPermissionUtils requestPermissionUtils;
 
     public RequestPermissionUtils.RequestPermissionCallback requestPermissionCallback = new RequestPermissionUtils.RequestPermissionCallback() {
         @Override
@@ -49,13 +52,13 @@ public class PhotosListViewActivity extends RoboActionBarActivity implements Pho
         return mPhotoRecyclerView;
     }
 
-    private List<FlickrPhoto> mFlickrPhotoList = new ArrayList<FlickrPhoto>();
+    private List<Photo> mFlickrPhotoList = new ArrayList<Photo>();
 
-    public List<FlickrPhoto> getFlickrPhotoList() {
+    public List<Photo> getFlickrPhotoList() {
         return mFlickrPhotoList;
     }
 
-    public void setFlickrPhotoList(List<FlickrPhoto> mFlickrPhotoList) {
+    public void setFlickrPhotoList(List<Photo> mFlickrPhotoList) {
         this.mFlickrPhotoList = mFlickrPhotoList;
     }
 
@@ -67,18 +70,23 @@ public class PhotosListViewActivity extends RoboActionBarActivity implements Pho
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ((LocalviewApplication) getApplication()).getRequestPermissionUtilsComponent().inject(this);
+        ((LocalviewApplication) getApplication()).getPhotoListManagerComponent().inject(this);
         super.onCreate(savedInstanceState);
         Fresco.initialize(this);
         setContentView(R.layout.activity_photos_list_view);
+        switcher = (ViewSwitcher) findViewById(R.id.ViewSwitcher);
+        switcher.showNext();
         mProgressBarSpinner = (ProgressBar)findViewById(R.id.progressBarSpinner);
         mPhotoRecyclerView = (RecyclerView) findViewById(R.id.listView);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mPhotoRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new GridLayoutManager(this, 4);
         mPhotoRecyclerView.setLayoutManager(mLayoutManager);
+        PhotoListAdapter emptyPhotoListAdapter = new PhotoListAdapter(new ArrayList<Photo>());
+        mPhotoRecyclerView.setAdapter(emptyPhotoListAdapter);
 
         if (savedInstanceState != null) {
             this.mFlickrPhotoList = savedInstanceState.getParcelableArrayList(SAVE_PHOTO_LIST_KEY);
@@ -95,8 +103,8 @@ public class PhotosListViewActivity extends RoboActionBarActivity implements Pho
     }
 
     protected void startPhotoListManager() {
+        switcher.setDisplayedChild(0);
         mProgressBarSpinner.setVisibility(View.VISIBLE);
-        boolean photoListFetched = mPhotoListManager.getPhotoListFetched();
         mPhotoListManager.setPhotoListManagerListener(this);
     }
 
@@ -118,6 +126,7 @@ public class PhotosListViewActivity extends RoboActionBarActivity implements Pho
     @Override
     protected void onResume() {
         super.onResume();
+        Log.wtf(TAG, "onResume");
         this.mProgressBarSpinner.setVisibility(View.INVISIBLE);
         if (this.mPhotoListState != null) {
             this.mPhotoRecyclerView.getLayoutManager().onRestoreInstanceState(this.mPhotoListState);
@@ -161,7 +170,7 @@ public class PhotosListViewActivity extends RoboActionBarActivity implements Pho
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        ArrayList<FlickrPhoto> listOfPhotos = new ArrayList<>(this.mFlickrPhotoList.size());
+        ArrayList<Photo> listOfPhotos = new ArrayList<>(this.mFlickrPhotoList.size());
         listOfPhotos.addAll(this.mFlickrPhotoList);
         outState.putParcelableArrayList(SAVE_PHOTO_LIST_KEY, listOfPhotos);
         this.mPhotoListState = this.mPhotoRecyclerView.getLayoutManager().onSaveInstanceState();
@@ -171,6 +180,7 @@ public class PhotosListViewActivity extends RoboActionBarActivity implements Pho
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.wtf(TAG, "onRestoreInstanceState");
         super.onRestoreInstanceState(savedInstanceState);
         this.mPhotoListState = savedInstanceState.getParcelable(PHOTO_LIST_STATE_KEY);
         if (savedInstanceState.containsKey(SAVE_PHOTO_LIST_KEY)) {
@@ -183,13 +193,14 @@ public class PhotosListViewActivity extends RoboActionBarActivity implements Pho
     protected void setupPhotoList() {
         PhotoListAdapter photoListAdapter = new PhotoListAdapter(this.mFlickrPhotoList);
         this.mPhotoRecyclerView.setAdapter(photoListAdapter);
-        if (this.mPhotoListState != null) {
+        if (this.mFlickrPhotoList != null) {
+            switcher.showNext();
             this.mPhotoRecyclerView.getLayoutManager().onRestoreInstanceState(this.mPhotoListState);
         }
     }
 
     @Override
-    public void photoListManagerDidFinish(List<FlickrPhoto> photoList) {
+    public void photoListManagerDidFinish(List<Photo> photoList) {
         this.mProgressBarSpinner.setVisibility(View.INVISIBLE);
         if (photoList.size() > 0) {
             this.mFlickrPhotoList = photoList;

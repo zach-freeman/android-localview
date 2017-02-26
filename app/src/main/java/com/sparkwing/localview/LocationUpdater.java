@@ -13,9 +13,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.inject.Inject;
 
-import roboguice.RoboGuice;
+import javax.inject.Inject;
 
 /**
  * Created by zachfreeman on 9/19/15.
@@ -41,14 +40,14 @@ public class LocationUpdater
     @Inject
     public LocationUpdater(Context context) {
         this.mContext = context;
-        RoboGuice.getInjector(context).injectMembers(this);
-        this.mRequestingLocationUpdates = true;
+        ((LocalviewApplication) context).getRequestPermissionUtilsComponent().inject(this);
         this.mGoogleApiClientStatus = GoogleApiClientStatus.CONNECTION_UNKNOWN;
         setupLocationService();
     }
 
-    private void setupLocationService() {
+    public void setupLocationService() {
         this.buildGoogleApiClient();
+        this.mRequestingLocationUpdates = true;
         mGoogleApiClient.connect();
         this.createLocationRequest();
     }
@@ -71,22 +70,21 @@ public class LocationUpdater
     @Override
     public void onConnected(Bundle bundle) {
         this.mGoogleApiClientStatus = GoogleApiClientStatus.CONNECTION_SUCCESS;
+        startLocationUpdates();
     }
 
     public void startLocationUpdates() {
-        Log.d(TAG, "startLocationUpdates");
         int permissionCheck = mRequestPermissionUtils.checkPermission(this.mContext, Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED &&
-                this.mGoogleApiClientStatus.equals(GoogleApiClientStatus.CONNECTION_SUCCESS)) {
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             try {
                 LocationServices.FusedLocationApi.requestLocationUpdates(
                         mGoogleApiClient, mLocationRequest, this);
             } catch (IllegalStateException illegalStateException) {
-                Log.d(TAG, "google api client not connected yet");
+                Log.d(TAG, "google api client not connected");
+                Log.d(TAG, illegalStateException.getLocalizedMessage());
             }
         } else {
-            Toast.makeText(this.mContext,
-                    "Unable to get location", Toast.LENGTH_LONG).show();
+            Toast.makeText(this.mContext, "Permission not granted", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -109,10 +107,11 @@ public class LocationUpdater
     @Override
     public void onLocationChanged(Location location) {
         this.mCurrentLocation = location;
-        this.mRequestingLocationUpdates = false;
-        this.stopLocationUpdates();
-        this.mLocationUpdaterListener.locationAvailable(this.mCurrentLocation);
-
+        //this.stopLocationUpdates();
+        if (this.mLocationUpdaterListener != null) {
+            this.mRequestingLocationUpdates = false;
+            this.mLocationUpdaterListener.locationAvailable(this.mCurrentLocation);
+        }
     }
 
     public String getGoogleApiClientStatus() {

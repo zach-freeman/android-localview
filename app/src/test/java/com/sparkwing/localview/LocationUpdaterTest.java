@@ -1,23 +1,22 @@
 package com.sparkwing.localview;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.widget.Toast;
-
-import com.sparkwing.localview.util.MockInject;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowToast;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(LocalviewTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21, manifest = "../app/src/main/AndroidManifest.xml")
@@ -25,7 +24,6 @@ public class LocationUpdaterTest {
 
     LocationUpdater subject;
     Context mContext;
-    @MockInject
     RequestPermissionUtils mRequestPermissionUtils;
 
 
@@ -34,7 +32,7 @@ public class LocationUpdaterTest {
         MockitoAnnotations.initMocks(this);
         mContext = RuntimeEnvironment.application;
         subject = new LocationUpdater(mContext);
-        Mockito.stub(mRequestPermissionUtils.checkPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)).toReturn(PackageManager.PERMISSION_GRANTED);
+        mRequestPermissionUtils = mock(RequestPermissionUtils.class);
     }
 
     @Test
@@ -55,12 +53,13 @@ public class LocationUpdaterTest {
 
     @Test
     public void testStartLocationUpdates_whenNotConnectedAndPermissionGranted_DoesNotShowToast() {
+        when(subject.mRequestPermissionUtils.checkPermission(any(Context.class), anyString())).thenReturn(-1);
         subject.setGoogleApiClientStatus(LocationUpdater.GoogleApiClientStatus.CONNECTION_FAIL);
         subject.startLocationUpdates();
         Toast actualToast = ShadowToast.getLatestToast();
         Assertions.assertThat(actualToast).isNotNull();
         String actualToastText = ShadowToast.getTextOfLatestToast();
-        Assertions.assertThat(actualToastText).isEqualTo("Unable to get location");
+        Assertions.assertThat(actualToastText).isEqualTo("Permission not granted");
 
     }
 }

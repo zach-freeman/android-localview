@@ -1,14 +1,13 @@
 package com.sparkwing.localview;
 
 
-import android.Manifest;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.sparkwing.localview.util.MockInject;
+import com.sparkwing.localview.Models.Photo;
 
 import org.fest.assertions.api.ANDROID;
 import org.fest.assertions.api.Assertions;
@@ -17,9 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.robolectric.Robolectric;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
@@ -31,35 +27,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.spy;
 
 @RunWith(LocalviewTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21, manifest = "../app/src/main/AndroidManifest.xml")
 public class PhotosListViewActivityTest {
     PhotosListViewActivity subject;
     ActivityController<PhotosListViewActivity> activityController;
-    @MockInject PhotoListManager mPhotoListManager;
-    @MockInject RequestPermissionUtils mRequestPermissionUtils;
 
     List flickrPhotoList;
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        Mockito.stub(mPhotoListManager.getPhotoListFetched()).toReturn(true);
 
         activityController = Robolectric.buildActivity(PhotosListViewActivity.class);
         subject = activityController.get();
-        Mockito.doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                subject.requestPermissionCallback.Granted(1);
-                return null;
-            }
-        }).when(mRequestPermissionUtils).requestPermission(subject, Manifest.permission.ACCESS_FINE_LOCATION, subject.requestPermissionCallback, Constants.MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        flickrPhotoList = new ArrayList<FlickrPhoto> (Arrays.asList(new FlickrPhoto("some-photo", "some-small-url", "some-big-url")));
+        Photo somePhoto = new Photo();
+        somePhoto.setId("some-photo-id");
+        somePhoto.setFarm(1);
+        somePhoto.setServer("some-server");
+        somePhoto.setSecret("shhh");
+        flickrPhotoList = new ArrayList<Photo> (Arrays.asList(somePhoto));
         subject.setFlickrPhotoList(flickrPhotoList);
         activityController.create().start();
+        spy(subject);
     }
 
     @Test
@@ -77,9 +72,8 @@ public class PhotosListViewActivityTest {
     }
 
     @Test
-    public void testOnCreate_callsSetPhotoListManager() {
-
-        Mockito.verify(mPhotoListManager).setPhotoListManagerListener(subject);
+    public void testOnCreate_callsSetPhotoListManagerListener() {
+        Mockito.verify(subject.mPhotoListManager).setPhotoListManagerListener(subject);
     }
 
     @Test
@@ -89,7 +83,7 @@ public class PhotosListViewActivityTest {
 
     @Test
     public void testPhotoListManagerDidFinish_withNoPhotos_ShowsToast() {
-        List emptyFlickrPhotoList = new ArrayList<FlickrPhoto> ();
+        List emptyFlickrPhotoList = new ArrayList<Photo> ();
         subject.photoListManagerDidFinish(emptyFlickrPhotoList);
         Toast actualToast = ShadowToast.getLatestToast();
         Assertions.assertThat(actualToast).isNotNull();
