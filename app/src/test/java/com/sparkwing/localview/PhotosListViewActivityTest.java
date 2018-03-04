@@ -53,7 +53,7 @@ public class PhotosListViewActivityTest {
         somePhoto.setSecret("shhh");
         flickrPhotoList = new ArrayList<Photo> (Arrays.asList(somePhoto));
         subject.setFlickrPhotoList(flickrPhotoList);
-        activityController.create().start();
+        activityController.create().start().visible();
         spy(subject);
     }
 
