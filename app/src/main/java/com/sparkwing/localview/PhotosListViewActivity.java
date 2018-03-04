@@ -28,6 +28,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
     private static final String SAVE_PHOTO_LIST_KEY = "photo-list";
     private static final String PHOTO_LIST_STATE_KEY = "photo-list-state";
     private Parcelable mPhotoListState = null;
+    private Menu mMenu;
     private ViewSwitcher switcher;
     @Inject
     public RequestPermissionUtils requestPermissionUtils;
@@ -147,6 +148,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_photos_list_view, menu);
+        mMenu = menu;
         return true;
     }
 
@@ -161,6 +163,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
         if (id == R.id.action_refresh) {
             this.mPhotoListState = null;
             this.startPhotoListManager();
+            mMenu.findItem(R.id.action_refresh).setEnabled(false);
             return true;
         }
 
@@ -202,6 +205,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
     @Override
     public void photoListManagerDidFinish(List<Photo> photoList) {
         this.mProgressBarSpinner.setVisibility(View.INVISIBLE);
+        mMenu.findItem(R.id.action_refresh).setEnabled(true);
         if (photoList.size() > 0) {
             this.mFlickrPhotoList = photoList;
             setupPhotoList();

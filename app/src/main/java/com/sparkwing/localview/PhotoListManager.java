@@ -39,13 +39,13 @@ public class PhotoListManager implements LocationUpdaterListener, PhotoListFetch
 
     public void setPhotoListManagerListener(PhotoListManagerListener mPhotoListManagerListener) {
         Log.d(TAG, "setting photomanagerlistener");
+        this.mPhotoListFetched = false;
         this.mPhotoListManagerListener = mPhotoListManagerListener;
         this.mLocationUpdater.setupLocationService();
     }
 
     public PhotoListManager(Context context) {
         ((LocalviewApplication) context.getApplicationContext()).getLocationUpdaterComponent().inject(this);
-        this.mPhotoListFetched = false;
         if (Reachability.isConnected(context)) {
             this.mLocationUpdater.setLocationUpdaterListener(this);
         } else {
