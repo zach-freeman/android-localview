@@ -27,6 +27,8 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
     private static final String TAG = PhotosListViewActivity.class.getSimpleName();
     private static final String SAVE_PHOTO_LIST_KEY = "photo-list";
     private static final String PHOTO_LIST_STATE_KEY = "photo-list-state";
+    private static final int SWITCHER_PROGRESS_BAR = 0;
+    private static final int SWITCHER_RECYCLER_VIEW = 1;
     private Parcelable mPhotoListState = null;
     private Menu mMenu;
     private ViewSwitcher switcher;
@@ -37,7 +39,12 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
         @Override
         public void Granted(int requestCode) {
             Log.d(TAG, "permission granted");
-            startPhotoListManager();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    startPhotoListManager();
+                }
+            });
         }
 
         @Override
@@ -77,7 +84,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
         Fresco.initialize(this);
         setContentView(R.layout.activity_photos_list_view);
         switcher = (ViewSwitcher) findViewById(R.id.ViewSwitcher);
-        switcher.showNext();
+        switcher.setDisplayedChild(SWITCHER_PROGRESS_BAR);
         mProgressBarSpinner = (ProgressBar)findViewById(R.id.progressBarSpinner);
         mPhotoRecyclerView = (RecyclerView) findViewById(R.id.listView);
         // use this setting to improve performance if you know that changes
@@ -104,7 +111,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
     }
 
     protected void startPhotoListManager() {
-        switcher.setDisplayedChild(0);
+        switcher.setDisplayedChild(SWITCHER_PROGRESS_BAR);
         mProgressBarSpinner.setVisibility(View.VISIBLE);
         mPhotoListManager.setPhotoListManagerListener(this);
     }
@@ -128,7 +135,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
     protected void onResume() {
         super.onResume();
         Log.wtf(TAG, "onResume");
-        this.mProgressBarSpinner.setVisibility(View.INVISIBLE);
+        this.mProgressBarSpinner.setVisibility(View.VISIBLE);
         if (this.mPhotoListState != null) {
             this.mPhotoRecyclerView.getLayoutManager().onRestoreInstanceState(this.mPhotoListState);
         }
@@ -197,7 +204,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
         PhotoListAdapter photoListAdapter = new PhotoListAdapter(this.mFlickrPhotoList);
         this.mPhotoRecyclerView.setAdapter(photoListAdapter);
         if (this.mFlickrPhotoList != null) {
-            switcher.showNext();
+            this.mProgressBarSpinner.setVisibility(View.VISIBLE);
             this.mPhotoRecyclerView.getLayoutManager().onRestoreInstanceState(this.mPhotoListState);
         }
     }
@@ -205,6 +212,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
     @Override
     public void photoListManagerDidFinish(List<Photo> photoList) {
         this.mProgressBarSpinner.setVisibility(View.INVISIBLE);
+        switcher.setDisplayedChild(SWITCHER_RECYCLER_VIEW);
         mMenu.findItem(R.id.action_refresh).setEnabled(true);
         if (photoList.size() > 0) {
             this.mFlickrPhotoList = photoList;
