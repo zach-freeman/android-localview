@@ -4,7 +4,6 @@ apply plugin: 'groovyx.grooid.groovy-android'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.sparkwing.localview"

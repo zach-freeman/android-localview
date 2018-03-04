@@ -83,7 +83,7 @@ public class PhotosListViewActivity extends ActionBarActivity implements PhotoLi
         // in content do not change the layout size of the RecyclerView
         mPhotoRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new GridLayoutManager(this, 4);
+        mLayoutManager = new GridLayoutManager(this, 5);
         mPhotoRecyclerView.setLayoutManager(mLayoutManager);
         PhotoListAdapter emptyPhotoListAdapter = new PhotoListAdapter(new ArrayList<Photo>());
         mPhotoRecyclerView.setAdapter(emptyPhotoListAdapter);
