@@ -11,11 +11,17 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+        buildConfigField 'String', 'BASE_APP_ID', '\"com.sparkwing.localview\"'
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
         }
     }
 }
