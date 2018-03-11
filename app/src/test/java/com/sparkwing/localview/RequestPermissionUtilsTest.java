@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 
 
 @RunWith(LocalviewTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, manifest = "../app/src/main/AndroidManifest.xml")
+@Config(constants = BuildConfig.class, packageName = BuildConfig.BASE_APP_ID, sdk = 21, manifest = "../app/src/main/AndroidManifest.xml")
 public class RequestPermissionUtilsTest {
 
     RequestPermissionUtils subject;

@@ -34,7 +34,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.spy;
 
 @RunWith(LocalviewTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, manifest = "../app/src/main/AndroidManifest.xml")
+@Config(constants = BuildConfig.class, packageName = BuildConfig.BASE_APP_ID, sdk = 21, manifest = "../app/src/main/AndroidManifest.xml")
 public class PhotosListViewActivityTest {
     PhotosListViewActivity subject;
     ActivityController<PhotosListViewActivity> activityController;
@@ -53,7 +53,7 @@ public class PhotosListViewActivityTest {
         somePhoto.setSecret("shhh");
         flickrPhotoList = new ArrayList<Photo> (Arrays.asList(somePhoto));
         subject.setFlickrPhotoList(flickrPhotoList);
-        activityController.create().start();
+        activityController.create().start().visible();
         spy(subject);
     }
 
