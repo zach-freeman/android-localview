@@ -1,6 +1,6 @@
 package com.sparkwing.localview;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;

@@ -3,9 +3,6 @@ package com.sparkwing.localview;
 import android.Manifest;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +19,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class PhotosListViewActivity extends ActionBarActivity implements PhotoListManagerListener{
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+public class PhotosListViewActivity extends AppCompatActivity implements PhotoListManagerListener{
 
     private static final String TAG = PhotosListViewActivity.class.getSimpleName();
     private static final String SAVE_PHOTO_LIST_KEY = "photo-list";
