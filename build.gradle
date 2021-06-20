@@ -3,9 +3,10 @@
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:4.2.1'
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'org.codehaus.groovy:gradle-groovy-android-plugin:0.3.6'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
@@ -18,5 +19,6 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        google()
     }
 }
